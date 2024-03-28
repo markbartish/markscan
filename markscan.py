@@ -5,16 +5,20 @@ import sqlite3
 
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER        = '\033[95m'
+    OKBLUE        = '\033[94m'
+    OKCYAN        = '\033[96m'
+    OKGREEN       = '\033[92m'
+    WARNING       = '\033[93m'
+    DBGGREY       = '\033[90m'
+    FAIL          = '\033[91m'
+    ENDC          = '\033[0m'
+    BOLD          = '\033[1m'
+    UNDERLINE     = '\033[4m'
 
+
+def dprint(text):
+    print(f'{bcolors.DBGGREY}{text}{bcolors.ENDC}')
 
 # Find out users home dir
 HOMEDIR = os.path.expanduser("~")
@@ -48,13 +52,12 @@ def register_hash(dbConn, fileAbsPath, hkey):
         else:
             print(f'Схоже я щось знайшов. Ось ці два файла мають ')
             print(f' Ідентітет: {bcolors.UNDERLINE}{hkey}{bcolors.ENDC}')
-            print(f' Файл-1:    {bcolors.BOLD}{bcolors.OKGREEN}{fileAbsPath}{bcolors.ENDC}')
-            print(f' Файл-2:    {bcolors.BOLD}{bcolors.OKGREEN}{tuple[1]}{bcolors.ENDC}')
+            print(f' Файл-1 (тільки що знайдений):    {bcolors.BOLD}{bcolors.OKGREEN}{fileAbsPath}{bcolors.ENDC}')
+            print(f' Файл-2 (заоеєстрований в хт):    {bcolors.BOLD}{bcolors.OKGREEN}{tuple[1]}{bcolors.ENDC}')
     else:
         cur.execute(f'INSERT INTO ht(hashkey, path) VALUES({hkey}, \'{fileAbsPath}\');')
         dbConn.commit()
     cur.close()
-
 
 def sum_files(dbConn, dirpath, filelist):
     for fname in filelist:
@@ -65,23 +68,18 @@ def sum_files(dbConn, dirpath, filelist):
             fsum = zlib.crc32(fdata)
             register_hash(dbConn, filefullname, fsum)
 
-
-
 def hashAllFilesInPath(dbConn, thePath):
     w = os.walk(thePath)
     for (dirpath, dirnames, filenames) in w:
-        for d in dirnames:
-            absd = os.path.abspath(os.path.join(thePath, d))
-            hashAllFilesInPath(dbConn, absd)
         sum_files(dbConn, dirpath, filenames)
 
 def printhelp():
     print(f'Треба ну хоча-б один з комманд:')
-    print(f'    {sys.argv[0]} status            - Перевірка актуального статуса хеш-таблиці')
-    print(f'    {sys.argv[0]} reset             - Знищення хеш-таблиці')
-    print(f'    {sys.argv[0]} scan              - Cтворення хеш-таблиці в актуальної директорїї')
+    print(f'    python {sys.argv[0]} status            - Перевірка актуального статуса хеш-таблиці')
+    print(f'    python {sys.argv[0]} reset             - Знищення хеш-таблиці')
+    print(f'    python {sys.argv[0]} scan              - Cтворення хеш-таблиці в актуальної директорїї')
 
-def cmdStatus(printOut = False):
+def cmdStatus(printOut = True):
     con = init_db(False)
     cur = con.cursor()
     hlookupres = cur.execute(f'SELECT COUNT(hashkey) FROM ht;')
@@ -93,12 +91,12 @@ def cmdStatus(printOut = False):
     return tuples[0]
 
 def cmdReset():
-    wasRecords = cmdStatus()
+    wasRecords = cmdStatus(False)
     init_db(True)
-    nowIsRecords = cmdStatus()
+    nowIsRecords = cmdStatus(False)
 
     if (nowIsRecords == 0):
-        print(f'reset Виконано успішно:')
+        print(f'reset виконано успішно:')
         print(f'В хештаблиці було {wasRecords} елементів а зараз їх там {nowIsRecords}')
     else:
         print(f'З reset щось пішло не так:')
