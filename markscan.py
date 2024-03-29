@@ -89,7 +89,8 @@ def register_hash(dbConn, fileAbsPath, hkey, fsize):
             else:
                 pass # should do some kind of warning
     else:
-        sqlString = f'INSERT INTO ht(hashkey, fsize, path) VALUES({hkey}, {fsize}, \'{fileAbsPath}\');'
+        fileAbsPathEscaped = fileAbsPath.replace("'", "''")
+        sqlString = f'INSERT INTO ht(hashkey, fsize, path) VALUES({hkey}, {fsize}, \'{fileAbsPathEscaped}\');'
         try:
             cur.execute(sqlString)
             dbConn.commit()
