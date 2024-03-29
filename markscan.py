@@ -89,8 +89,16 @@ def register_hash(dbConn, fileAbsPath, hkey, fsize):
             else:
                 pass # should do some kind of warning
     else:
-        cur.execute(f'INSERT INTO ht(hashkey, fsize, path) VALUES({hkey}, {fsize}, \'{fileAbsPath}\');')
-        dbConn.commit()
+        sqlString = f'INSERT INTO ht(hashkey, fsize, path) VALUES({hkey}, {fsize}, \'{fileAbsPath}\');'
+        try:
+            cur.execute(sqlString)
+            dbConn.commit()
+        except sqlite3.OperationalError:
+            print(f'\n{bcolors.FAIL}Сорян, якась помилка при реєстрації у хештаблиці.{bcolors.ENDC}', flush=True)
+            dprint(sqlString)
+            cur.close()
+            dbConn.close()
+            exit(1)
     cur.close()
 
 def sum_files(dbConn, dirpath, filelist):
