@@ -208,7 +208,7 @@ def printhelp():
     print(f'    python {sys.argv[0]} status            - Перевірка актуального статуса хеш-таблиці')
     print(f'    python {sys.argv[0]} reset             - Знищення хеш-таблиці')
     print(f'    python {sys.argv[0]} scan              - Cтворення хеш-таблиці в актуальної директорїї')
-    print(f'    python {sys.argv[0]} prune             - Пошук адрес з хештаблиці яки (більше) не існують у файловій системі')
+    print(f'    python {sys.argv[0]} prune             - Пошук адрес в хештаблиці яки (більше) не існують у файловій системі')
 
 def cmdStatus(printOut = True):
     con = init_db(False)
