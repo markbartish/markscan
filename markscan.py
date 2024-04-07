@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import zlib
@@ -176,15 +178,20 @@ def sum_files(dbConn, dirpath, filelist):
 def hashAllFilesInPath(dbConn, thePath):
     w = os.walk(thePath)
     for (dirpath, dirnames, filenames) in w:
-        sum_files(dbConn, dirpath, filenames)
+        if not (os.path.sep + '.git') in dirpath:
+            sum_files(dbConn, dirpath, filenames)
+        else:
+            pass
+            # print(f'{bcolors.FAIL}Skipping {dirpath}{bcolors.ENDC}', flush=True)
 
 def generateThePruneList(dbConn):
     cur = dbConn.cursor()
     resultset = cur.execute(f'SELECT path FROM paths;')
     for r in resultset:
-        pathExists = print(os.path.exists(r[0]))
+        pathExists = os.path.exists(r[0])
         if pathExists == True:
-            print(f'Path in the list: {r[0]}: {bcolors.OKGREEN}  EXISTS{        bcolors.ENDC}')
+            pass
+            #print(f'Path in the list: {r[0]}: {bcolors.OKGREEN}  EXISTS{        bcolors.ENDC}')
         else:
             print(f'Path in the list: {r[0]}: {bcolors.FAIL   }  DOES NOT EXIST{bcolors.ENDC}')
     cur.close()
