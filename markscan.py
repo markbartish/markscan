@@ -216,6 +216,7 @@ def printhelp():
     print(f'    python {sys.argv[0]} reset             - Знищення хеш-таблиці')
     print(f'    python {sys.argv[0]} scan              - Cтворення хеш-таблиці в актуальної директорїї')
     print(f'    python {sys.argv[0]} prune             - Пошук адрес в хештаблиці яки (більше) не існують у файловій системі')
+    print(f'    python {sys.argv[0]} print             - Print the findings currently in ht')
 
 def cmdStatus(printOut = True):
     con = init_db(False)
@@ -257,9 +258,12 @@ def cmdPrune():
     generateThePruneList(con)
     printThePruneList(con)
     # Ask the usr whether really prune and then prune
-
     doPrune(con)
 
+def cmdPrint():
+    con = init_db(False)
+    print_findings(con)
+    con.close()
 
 def main():
     if len(sys.argv) < 2:
@@ -281,6 +285,9 @@ def main():
             exit(0)
         elif (sys.argv[1] == "prune"):
             cmdPrune()
+            exit(0)
+        elif (sys.argv[1] == "print"):
+            cmdPrint()
             exit(0)
         else:
             printhelp()
