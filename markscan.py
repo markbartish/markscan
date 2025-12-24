@@ -43,8 +43,8 @@ PATHTTOSCAN = os.getcwd()
 verbose_mode = False
 
 DUBLETTES_SQL = """
-SELECT hashkeys.hashkey AS hkey, path FROM paths INNER JOIN hashkeys 
-    ON hashkeys.id = paths.hashkey_id 
+SELECT hashkeys.hashkey AS hkey, path FROM paths INNER JOIN hashkeys
+    ON hashkeys.id = paths.hashkey_id
     WHERE hashkey_id IN (
         SELECT hashkey_id FROM (
             SELECT paths.hashkey_id, COUNT(path) AS cpaths FROM paths GROUP BY paths.hashkey_id
@@ -113,7 +113,7 @@ def register_hash(dbConn, fileAbsPath, hkey, fsize):
     if (hkcount == 0):
         #dprint('hkcount == 0')
         cur.execute(f'INSERT INTO hashkeys (hashkey) VALUES ({hkey})')
-        
+
     hlookupres =    cur.execute(f'SELECT id, hashkey FROM hashkeys WHERE hashkey = {hkey};').fetchall()
     hkcount = len(hlookupres)
 
@@ -127,7 +127,7 @@ def register_hash(dbConn, fileAbsPath, hkey, fsize):
     #dprint(pathscountres[0][0])
     if (pathscount == 0):
         sqlString = f'INSERT INTO paths (hashkey_id, fsize, path) VALUES({hlookupres[0][0]}, {fsize}, \'{fileAbsPathEscaped}\');'
-        try:    
+        try:
             cur.execute(sqlString)
             dbConn.commit()
         except sqlite3.OperationalError:
@@ -173,7 +173,7 @@ def sum_files(dbConn, dirpath, filelist):
     if verbose_mode == False:
         progress(100)
         print(f'\n', flush=True)
-            
+
 
 def hashAllFilesInPath(dbConn, thePath):
     w = os.walk(thePath)
@@ -293,4 +293,5 @@ def main():
             printhelp()
             exit(1)
 
-main()
+if __name__ == '__main__':
+    main()
